@@ -4,7 +4,8 @@ import { NestFactory } from '@nestjs/core'
 import RedisStore from 'connect-redis'
 import * as cookieParser from 'cookie-parser'
 import * as session from 'express-session'
-import IORedis from 'ioredis'
+// import IORedis from 'ioredis'
+import { createClient } from 'redis';
 
 import { AppModule } from './app.module'
 import { ms, StringValue } from './libs/common/utils/ms.util'
@@ -24,7 +25,8 @@ async function bootstrap() {
 	const app = await NestFactory.create(AppModule)
 
 	const config = app.get(ConfigService)
-	const redis = new IORedis(config.getOrThrow('REDIS_URI'))
+	// const redis = new IORedis(config.getOrThrow('REDIS_URI'))
+	const redis =  await createClient({ url: process.env.REDIS_URL }).connect();
 
 	app.use((cookieParser as any)(config.getOrThrow<string>('COOKIES_SECRET')))
 
