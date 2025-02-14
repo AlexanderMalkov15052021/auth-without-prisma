@@ -9,6 +9,9 @@ import { AppModule } from './app.module'
 import { ms, StringValue } from './libs/common/utils/ms.util'
 import { parseBoolean } from './libs/common/utils/parse-boolean.util'
 
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 /**
  * Запускает приложение NestJS.
  *
