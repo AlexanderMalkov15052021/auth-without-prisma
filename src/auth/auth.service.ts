@@ -6,11 +6,9 @@ import {
 	UnauthorizedException
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { AuthMethod, User } from '@prisma/__generated__'
 import { verify } from 'argon2'
 import { Request, Response } from 'express'
 
-import { PrismaService } from '@/prisma/prisma.service'
 import { UserService } from '@/user/user.service'
 
 import { LoginDto } from './dto/login.dto'
@@ -69,7 +67,7 @@ export class AuthService {
 
 		const reqNewUser = await pool.query(
 			`INSERT INTO users (email, password, display_name, picture, method, is_verified) values ($1, $2, $3, $4, $5, $6) RETURNING *`,
-			[dto.email, dto.password, dto.name, '', AuthMethod.CREDENTIALS, false]
+			[dto.email, dto.password, dto.name, '', 'CREDENTIALS', false]
 		);
 
 		await this.emailConfirmationService.sendVerificationToken(reqNewUser.rows[0].email);
@@ -237,7 +235,7 @@ export class AuthService {
 	 * @returns Промис, который разрешается после сохранения сессии.
 	 * @throws InternalServerErrorException - Если возникла проблема при сохранении сессии.
 	 */
-	public async saveSession(req: Request, user: User) {
+	public async saveSession(req: Request, user: any) {
 		return new Promise((resolve, reject) => {
 			req.session.userId = user.id
 

@@ -6,7 +6,6 @@ import {
 	Injectable,
 	NotFoundException
 } from '@nestjs/common'
-import { TokenType } from '@prisma/__generated__'
 import { Request } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -150,7 +149,7 @@ export class EmailConfirmationService {
 			// })
 
 			// если вдруг такой токен уже есть с этим email
-			await pool.query(`DELETE FROM tokens where id = $1 and type = $2`, [existingTokenReq.rows[0].id, TokenType.VERIFICATION]);
+			await pool.query(`DELETE FROM tokens where id = $1 and type = $2`, [existingTokenReq.rows[0].id, 'VERIFICATION']);
 		}
 
 		// const verificationToken = await this.prismaService.token.create({
@@ -164,7 +163,7 @@ export class EmailConfirmationService {
 
 		const verificationTokenReq = await pool.query(
 			`INSERT INTO tokens (email, token, expires_in, type) values ($1, $2, $3, $4) RETURNING *`,
-			[email, token, expiresIn, TokenType.VERIFICATION]
+			[email, token, expiresIn, 'VERIFICATION']
 		);
 
 		return verificationTokenReq.rows[0]

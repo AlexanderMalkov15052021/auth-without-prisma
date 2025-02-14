@@ -5,7 +5,6 @@ import {
 	Injectable
 } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
-import { UserRole } from '@prisma/__generated__'
 
 import { ROLES_KEY } from '../decorators/roles.decorator'
 
@@ -27,7 +26,7 @@ export class RolesGuard implements CanActivate {
 	 * @throws ForbiddenException - Если у пользователя недостаточно прав.
 	 */
 	public async canActivate(context: ExecutionContext): Promise<boolean> {
-		const roles = this.reflector.getAllAndOverride<UserRole[]>(ROLES_KEY, [
+		const roles = this.reflector.getAllAndOverride<any[]>(ROLES_KEY, [
 			context.getHandler(),
 			context.getClass()
 		])

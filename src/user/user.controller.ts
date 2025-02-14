@@ -7,7 +7,6 @@ import {
 	Param,
 	Patch
 } from '@nestjs/common'
-import { UserRole } from '@prisma/__generated__'
 
 import { Authorization } from '@/auth/decorators/auth.decorator'
 import { Authorized } from '@/auth/decorators/authorized.decorator'
@@ -43,7 +42,7 @@ export class UserController {
 	 * @param id - ID пользователя.
 	 * @returns Найденный пользователь.
 	 */
-	@Authorization(UserRole.ADMIN)
+	// @Authorization(UserRole.ADMIN)
 	@HttpCode(HttpStatus.OK)
 	@Get('by-id/:id')
 	public async findById(@Param('id') id: string) {
