@@ -32,30 +32,30 @@ async function bootstrap() {
 		})
 	)
 
-	app.use(
-		(session as any)({
-			// Настройки управления сессиями с использованием Redis
-			secret: process.env.SESSION_SECRET,
-			name: process.env.SESSION_NAME,
-			resave: true,
-			saveUninitialized: false,
-			cookie: {
-				domain: process.env.SESSION_DOMAIN,
-				maxAge: ms(process.env.SESSION_MAX_AGE as StringValue),
-				httpOnly: parseBoolean(
-					process.env.SESSION_HTTP_ONLY
-				),
-				secure: parseBoolean(
-					process.env.SESSION_SECURE
-				),
-				sameSite: 'lax'
-			},
-			store: new RedisStore({
-				client: redis,
-				prefix: process.env.SESSION_FOLDER
-			})
-		})
-	)
+	// app.use(
+	// 	(session as any)({
+	// 		// Настройки управления сессиями с использованием Redis
+	// 		secret: process.env.SESSION_SECRET,
+	// 		name: process.env.SESSION_NAME,
+	// 		resave: true,
+	// 		saveUninitialized: false,
+	// 		cookie: {
+	// 			domain: process.env.SESSION_DOMAIN,
+	// 			maxAge: ms(process.env.SESSION_MAX_AGE as StringValue),
+	// 			httpOnly: parseBoolean(
+	// 				process.env.SESSION_HTTP_ONLY
+	// 			),
+	// 			secure: parseBoolean(
+	// 				process.env.SESSION_SECURE
+	// 			),
+	// 			sameSite: 'lax'
+	// 		},
+	// 		store: new RedisStore({
+	// 			client: redis,
+	// 			prefix: process.env.SESSION_FOLDER
+	// 		})
+	// 	})
+	// )
 
 	app.enableCors({
 		// Настройки CORS для приложения
