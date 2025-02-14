@@ -1,8 +1,8 @@
 import { ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import RedisStore from 'connect-redis'
-import * as cookieParser from 'cookie-parser'
-import * as session from 'express-session'
+import cookieParser from 'cookie-parser'
+import session from 'express-session'
 import IORedis from 'ioredis'
 
 import { AppModule } from './app.module'
@@ -12,22 +12,12 @@ import { parseBoolean } from './libs/common/utils/parse-boolean.util'
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-/**
- * Запускает приложение NestJS.
- *
- * Функция инициализирует приложение, настраивает промежуточное ПО,
- * конфигурирует управление сессиями и запускает сервер.
- *
- * @async
- * @function bootstrap
- * @returns {Promise<void>} Промис, который разрешается, когда приложение запущено.
- */
 async function bootstrap() {
-	const app = await NestFactory.create(AppModule)
+	const app = await NestFactory.create(AppModule);
 
-	// const redis = new IORedis(process.env.REDIS_URI)
+	const redis = new IORedis(process.env.REDIS_URL);
 
-	// app.use((cookieParser as any)(process.env.COOKIES_SECRET))
+	app.use((cookieParser as any)(process.env.COOKIES_SECRET));
 
 	app.useGlobalPipes(
 		new ValidationPipe({
@@ -35,30 +25,30 @@ async function bootstrap() {
 		})
 	)
 
-	// app.use(
-	// 	(session as any)({
-	// 		// Настройки управления сессиями с использованием Redis
-	// 		secret: process.env.SESSION_SECRET,
-	// 		name: process.env.SESSION_NAME,
-	// 		resave: true,
-	// 		saveUninitialized: false,
-	// 		cookie: {
-	// 			domain: process.env.SESSION_DOMAIN,
-	// 			maxAge: ms(process.env.SESSION_MAX_AGE as StringValue),
-	// 			httpOnly: parseBoolean(
-	// 				process.env.SESSION_HTTP_ONLY
-	// 			),
-	// 			secure: parseBoolean(
-	// 				process.env.SESSION_SECURE
-	// 			),
-	// 			sameSite: 'lax'
-	// 		},
-	// 		store: new RedisStore({
-	// 			client: redis,
-	// 			prefix: process.env.SESSION_FOLDER
-	// 		})
-	// 	})
-	// )
+	app.use(
+		(session as any)({
+			// Настройки управления сессиями с использованием Redis
+			secret: process.env.SESSION_SECRET,
+			name: process.env.SESSION_NAME,
+			resave: true,
+			saveUninitialized: false,
+			cookie: {
+				domain: process.env.SESSION_DOMAIN,
+				maxAge: ms(process.env.SESSION_MAX_AGE as StringValue),
+				httpOnly: parseBoolean(
+					process.env.SESSION_HTTP_ONLY
+				),
+				secure: parseBoolean(
+					process.env.SESSION_SECURE
+				),
+				sameSite: 'lax'
+			},
+			store: new RedisStore({
+				client: redis,
+				prefix: process.env.SESSION_FOLDER
+			})
+		})
+	)
 
 	app.enableCors({
 		// Настройки CORS для приложения
@@ -67,6 +57,6 @@ async function bootstrap() {
 		exposedHeaders: ['set-cookie']
 	})
 
-	await app.listen(process.env.APPLICATION_PORT)
+	await app.listen(process.env.APPLICATION_PORT ?? 4000)
 }
 bootstrap()
