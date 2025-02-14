@@ -5,7 +5,7 @@ import RedisStore from 'connect-redis'
 import * as cookieParser from 'cookie-parser'
 import * as session from 'express-session'
 // import IORedis from 'ioredis'
-import { createClient } from 'redis';
+// import { createClient } from 'redis';
 
 import { AppModule } from './app.module'
 import { ms, StringValue } from './libs/common/utils/ms.util'
@@ -26,7 +26,7 @@ async function bootstrap() {
 
 	const config = app.get(ConfigService)
 	// const redis = new IORedis(config.getOrThrow('REDIS_URI'))
-	const redis = await createClient({ url: process.env.REDIS_URI }).connect();
+	// const redis = await createClient({ url: process.env.REDIS_URI }).connect();
 
 	app.use((cookieParser as any)(config.getOrThrow<string>('COOKIES_SECRET')))
 
@@ -54,10 +54,10 @@ async function bootstrap() {
 				),
 				sameSite: 'lax'
 			},
-			store: new RedisStore({
-				client: redis,
-				prefix: config.getOrThrow<string>('SESSION_FOLDER')
-			})
+			// store: new RedisStore({
+			// 	client: redis,
+			// 	prefix: config.getOrThrow<string>('SESSION_FOLDER')
+			// })
 		})
 	)
 
