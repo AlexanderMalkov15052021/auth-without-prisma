@@ -25,7 +25,7 @@ dotenv.config();
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule)
 
-	const redis = new IORedis(process.env.REDIS_URI)
+	// const redis = new IORedis(process.env.REDIS_URI)
 
 	// app.use((cookieParser as any)(process.env.COOKIES_SECRET))
 
