@@ -26,7 +26,7 @@ async function bootstrap() {
 
 	const config = app.get(ConfigService)
 	// const redis = new IORedis(config.getOrThrow('REDIS_URI'))
-	const redis =  await createClient({ url: process.env.REDIS_URL }).connect();
+	const redis = await createClient({ url: process.env.REDIS_URI }).connect();
 
 	app.use((cookieParser as any)(config.getOrThrow<string>('COOKIES_SECRET')))
 
