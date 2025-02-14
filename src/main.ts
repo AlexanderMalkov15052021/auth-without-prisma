@@ -26,7 +26,7 @@ async function bootstrap() {
 	const config = app.get(ConfigService)
 	const redis = new IORedis(config.getOrThrow('REDIS_URI'))
 
-	app.use(cookieParser(config.getOrThrow<string>('COOKIES_SECRET')))
+	app.use((cookieParser as any)(config.getOrThrow<string>('COOKIES_SECRET')))
 
 	app.useGlobalPipes(
 		new ValidationPipe({
@@ -35,7 +35,7 @@ async function bootstrap() {
 	)
 
 	app.use(
-		session({
+		(session as any)({
 			// Настройки управления сессиями с использованием Redis
 			secret: config.getOrThrow<string>('SESSION_SECRET'),
 			name: config.getOrThrow<string>('SESSION_NAME'),
