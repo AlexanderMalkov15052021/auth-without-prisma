@@ -27,7 +27,7 @@ async function bootstrap() {
 
 	const redis = new IORedis(process.env.REDIS_URI)
 
-	app.use((cookieParser as any)(process.env.COOKIES_SECRET))
+	// app.use((cookieParser as any)(process.env.COOKIES_SECRET))
 
 	app.useGlobalPipes(
 		new ValidationPipe({
