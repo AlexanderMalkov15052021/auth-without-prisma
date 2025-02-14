@@ -18,6 +18,7 @@ import { RegisterDto } from './dto/register.dto'
 import { EmailConfirmationService } from './email-confirmation/email-confirmation.service'
 import { ProviderService } from './provider/provider.service'
 import { TwoFactorAuthService } from './two-factor-auth/two-factor-auth.service'
+import { pool } from '@/db/pool.module'
 
 /**
  * Сервис для аутентификации и управления сессиями пользователей.
@@ -26,7 +27,6 @@ import { TwoFactorAuthService } from './two-factor-auth/two-factor-auth.service'
 export class AuthService {
 	/**
 	 * Конструктор сервиса аутентификации.
-	 * @param prismaService - Сервис для работы с базой данных Prisma.
 	 * @param userService - Сервис для работы с пользователями.
 	 * @param configService - Сервис для работы с конфигурацией приложения.
 	 * @param providerService - Сервис для работы с провайдерами аутентификации.
@@ -34,7 +34,7 @@ export class AuthService {
 	 * @param twoFactorAuthService - Сервис для работы с двухфакторной аутентификацией.
 	 */
 	public constructor(
-		private readonly prismaService: PrismaService,
+		// private readonly prismaService: PrismaService,
 		private readonly userService: UserService,
 		private readonly configService: ConfigService,
 		private readonly providerService: ProviderService,
@@ -49,7 +49,8 @@ export class AuthService {
 	 * @throws ConflictException - Если пользователь с таким email уже существует.
 	 */
 	public async register(dto: RegisterDto) {
-		const isExists = await this.userService.findByEmail(dto.email)
+
+		const isExists = await this.userService.findByEmail(dto.email);
 
 		if (isExists) {
 			throw new ConflictException(
@@ -57,16 +58,21 @@ export class AuthService {
 			)
 		}
 
-		const newUser = await this.userService.create(
-			dto.email,
-			dto.password,
-			dto.name,
-			'',
-			AuthMethod.CREDENTIALS,
-			false
-		)
+		// const newUser = await this.userService.create(
+		// 	dto.email,
+		// 	dto.password,
+		// 	dto.name,
+		// 	'',
+		// 	AuthMethod.CREDENTIALS,
+		// 	false
+		// )
 
-		await this.emailConfirmationService.sendVerificationToken(newUser.email)
+		const reqNewUser = await pool.query(
+			`INSERT INTO users (email, password, display_name, picture, method, is_verified) values ($1, $2, $3, $4, $5, $6) RETURNING *`,
+			[dto.email, dto.password, dto.name, '', AuthMethod.CREDENTIALS, false]
+		);
+
+		await this.emailConfirmationService.sendVerificationToken(reqNewUser.rows[0].email);
 
 		return {
 			message:
@@ -144,59 +150,59 @@ export class AuthService {
 		const providerInstance = this.providerService.findByService(provider)
 		const profile = await providerInstance.findUserByCode(code)
 
-		const account = await this.prismaService.account.findFirst({
-			where: {
-				id: profile.id,
-				provider: profile.provider
-			}
-		})
+		// const account = await this.prismaService.account.findFirst({
+		// 	where: {
+		// 		id: profile.id,
+		// 		provider: profile.provider
+		// 	}
+		// })
 
-		let user = account?.userId
-			? await this.userService.findById(account.userId)
-			: null
+		// let user = account?.userId
+		// 	? await this.userService.findById(account.userId)
+		// 	: null
 
-		if (user) {
-			return this.saveSession(req, user)
-		}
+		// if (user) {
+		// 	return this.saveSession(req, user)
+		// }
 
 		// checking for a user
-		const foundUser = await this.prismaService.user.findUnique({
-			where: {
-				email: profile.email
-			},
-			include: {
-				accounts: true
-			}
-		});
+		// const foundUser = await this.prismaService.user.findUnique({
+		// 	where: {
+		// 		email: profile.email
+		// 	},
+		// 	include: {
+		// 		accounts: true
+		// 	}
+		// });
 
-		if (foundUser) {
-			user = foundUser;
-		}
-		else {
-			user = await this.userService.create(
-				profile.email,
-				'',
-				profile.name,
-				profile.picture,
-				AuthMethod[profile.provider.toUpperCase()],
-				true
-			);
-		}
+		// if (foundUser) {
+		// 	user = foundUser;
+		// }
+		// else {
+		// 	user = await this.userService.create(
+		// 		profile.email,
+		// 		'',
+		// 		profile.name,
+		// 		profile.picture,
+		// 		AuthMethod[profile.provider.toUpperCase()],
+		// 		true
+		// 	);
+		// }
 
-		if (!account) {
-			await this.prismaService.account.create({
-				data: {
-					userId: user.id,
-					type: 'oauth',
-					provider: profile.provider,
-					accessToken: profile.access_token,
-					refreshToken: profile.refresh_token,
-					expiresAt: profile.expires_at
-				}
-			})
-		}
+		// if (!account) {
+		// 	await this.prismaService.account.create({
+		// 		data: {
+		// 			userId: user.id,
+		// 			type: 'oauth',
+		// 			provider: profile.provider,
+		// 			accessToken: profile.access_token,
+		// 			refreshToken: profile.refresh_token,
+		// 			expiresAt: profile.expires_at
+		// 		}
+		// 	})
+		// }
 
-		return this.saveSession(req, user)
+		return `this.saveSession(req, user)`
 	}
 
 	/**

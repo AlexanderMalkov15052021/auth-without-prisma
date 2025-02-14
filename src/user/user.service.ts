@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common'
 import { AuthMethod } from '@prisma/__generated__'
 import { hash } from 'argon2'
 
-import { PrismaService } from '@/prisma/prisma.service'
+// import { PrismaService } from '@/prisma/prisma.service'
 
 import { UpdateUserDto } from './dto/update-user.dto'
+import { pool } from '@/db/pool.module';
 
 /**
  * Сервис для работы с пользователями.
@@ -15,7 +16,7 @@ export class UserService {
 	 * Конструктор сервиса пользователей.
 	 * @param prismaService - Сервис для работы с базой данных Prisma.
 	 */
-	public constructor(private readonly prismaService: PrismaService) {}
+	// public constructor(private readonly prismaService: PrismaService) { }
 
 	/**
 	 * Находит пользователя по ID.
@@ -24,22 +25,22 @@ export class UserService {
 	 * @throws {NotFoundException} Если пользователь не найден.
 	 */
 	public async findById(id: string) {
-		const user = await this.prismaService.user.findUnique({
-			where: {
-				id
-			},
-			include: {
-				accounts: true
-			}
-		})
+		// const user = await this.prismaService.user.findUnique({
+		// 	where: {
+		// 		id
+		// 	},
+		// 	include: {
+		// 		accounts: true
+		// 	}
+		// })
 
-		if (!user) {
-			throw new NotFoundException(
-				'Пользователь не найден. Пожалуйста, проверьте введенные данные.'
-			)
-		}
+		// if (!user) {
+		// 	throw new NotFoundException(
+		// 		'Пользователь не найден. Пожалуйста, проверьте введенные данные.'
+		// 	)
+		// }
 
-		return user
+		return `user`
 	}
 
 	/**
@@ -48,16 +49,18 @@ export class UserService {
 	 * @returns {Promise<User | null>} Найденный пользователь или null, если не найден.
 	 */
 	public async findByEmail(email: string) {
-		const user = await this.prismaService.user.findUnique({
-			where: {
-				email
-			},
-			include: {
-				accounts: true
-			}
-		})
+		// const user = await this.prismaService.user.findUnique({
+		// 	where: {
+		// 		email
+		// 	},
+		// 	include: {
+		// 		accounts: true
+		// 	}
+		// })
 
-		return user
+		const userReq = await pool.query(`SELECT * FROM users WHERE email = $1`, [email]);
+
+		return userReq.rows[0];
 	}
 
 	/**
@@ -78,21 +81,21 @@ export class UserService {
 		method: AuthMethod,
 		isVerified: boolean
 	) {
-		const user = await this.prismaService.user.create({
-			data: {
-				email,
-				password: password ? await hash(password) : '',
-				displayName,
-				picture,
-				method,
-				isVerified
-			},
-			include: {
-				accounts: true
-			}
-		})
+		// const user = await this.prismaService.user.create({
+		// 	data: {
+		// 		email,
+		// 		password: password ? await hash(password) : '',
+		// 		displayName,
+		// 		picture,
+		// 		method,
+		// 		isVerified
+		// 	},
+		// 	include: {
+		// 		accounts: true
+		// 	}
+		// })
 
-		return user
+		return 1
 	}
 
 	/**
@@ -102,19 +105,19 @@ export class UserService {
 	 * @returns Обновленный пользователь.
 	 */
 	public async update(userId: string, dto: UpdateUserDto) {
-		const user = await this.findById(userId)
+		// const user = await this.findById(userId)
 
-		const updatedUser = await this.prismaService.user.update({
-			where: {
-				id: user.id
-			},
-			data: {
-				email: dto.email,
-				displayName: dto.name,
-				isTwoFactorEnabled: dto.isTwoFactorEnabled
-			}
-		})
+		// const updatedUser = await this.prismaService.user.update({
+		// 	where: {
+		// 		id: user.id
+		// 	},
+		// 	data: {
+		// 		email: dto.email,
+		// 		displayName: dto.name,
+		// 		isTwoFactorEnabled: dto.isTwoFactorEnabled
+		// 	}
+		// })
 
-		return updatedUser
+		return 1
 	}
 }

@@ -8,8 +8,10 @@ import { ProviderModule } from './auth/provider/provider.module'
 import { TwoFactorAuthModule } from './auth/two-factor-auth/two-factor-auth.module'
 import { IS_DEV_ENV } from './libs/common/utils/is-dev.util'
 import { MailModule } from './libs/mail/mail.module'
-import { PrismaModule } from './prisma/prisma.module'
+// import { PrismaModule } from './prisma/prisma.module'
 import { UserModule } from './user/user.module'
+import { AppController } from './app.controller'
+import { AppService } from './app.service'
 
 @Module({
 	imports: [
@@ -17,7 +19,7 @@ import { UserModule } from './user/user.module'
 			ignoreEnvFile: !IS_DEV_ENV,
 			isGlobal: true
 		}),
-		PrismaModule,
+		// PrismaModule,
 		AuthModule,
 		UserModule,
 		ProviderModule,
@@ -25,6 +27,8 @@ import { UserModule } from './user/user.module'
 		EmailConfirmationModule,
 		PasswordRecoveryModule,
 		TwoFactorAuthModule
-	]
+	],
+	controllers: [AppController],
+	providers: [AppService]
 })
-export class AppModule {}
+export class AppModule { }

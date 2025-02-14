@@ -21,12 +21,11 @@ import { ResetPasswordDto } from './dto/reset-password.dto'
 export class PasswordRecoveryService {
 	/**
 	 * Конструктор сервиса восстановления пароля.
-	 * @param prismaService - Сервис для работы с базой данных Prisma.
 	 * @param userService - Сервис для работы с пользователями.
 	 * @param mailService - Сервис для отправки email-сообщений.
 	 */
 	public constructor(
-		private readonly prismaService: PrismaService,
+		// private readonly prismaService: PrismaService,
 		private readonly userService: UserService,
 		private readonly mailService: MailService
 	) {}
@@ -38,22 +37,22 @@ export class PasswordRecoveryService {
 	 * @throws NotFoundException - Если пользователь не найден.
 	 */
 	public async reset(dto: ResetPasswordDto) {
-		const existingUser = await this.userService.findByEmail(dto.email)
+		// const existingUser = await this.userService.findByEmail(dto.email)
 
-		if (!existingUser) {
-			throw new NotFoundException(
-				'Пользователь не найден. Пожалуйста, проверьте введенный адрес электронной почты и попробуйте снова.'
-			)
-		}
+		// if (!existingUser) {
+		// 	throw new NotFoundException(
+		// 		'Пользователь не найден. Пожалуйста, проверьте введенный адрес электронной почты и попробуйте снова.'
+		// 	)
+		// }
 
-		const passwordResetToken = await this.generatePasswordResetToken(
-			existingUser.email
-		)
+		// const passwordResetToken = await this.generatePasswordResetToken(
+		// 	existingUser.email
+		// )
 
-		await this.mailService.sendPasswordResetEmail(
-			passwordResetToken.email,
-			passwordResetToken.token
-		)
+		// await this.mailService.sendPasswordResetEmail(
+		// 	passwordResetToken.email,
+		// 	passwordResetToken.token
+		// )
 
 		return true
 	}
@@ -67,52 +66,52 @@ export class PasswordRecoveryService {
 	 * @throws BadRequestException - Если токен истек.
 	 */
 	public async new(dto: NewPasswordDto, token: string) {
-		const existingToken = await this.prismaService.token.findFirst({
-			where: {
-				token,
-				type: TokenType.PASSWORD_RESET
-			}
-		})
+		// const existingToken = await this.prismaService.token.findFirst({
+		// 	where: {
+		// 		token,
+		// 		type: TokenType.PASSWORD_RESET
+		// 	}
+		// })
 
-		if (!existingToken) {
-			throw new NotFoundException(
-				'Токен не найден. Пожалуйста, проверьте правильность введенного токена или запросите новый.'
-			)
-		}
+		// if (!existingToken) {
+		// 	throw new NotFoundException(
+		// 		'Токен не найден. Пожалуйста, проверьте правильность введенного токена или запросите новый.'
+		// 	)
+		// }
 
-		const hasExpired = new Date(existingToken.expiresIn) < new Date()
+		// const hasExpired = new Date(existingToken.expiresIn) < new Date()
 
-		if (hasExpired) {
-			throw new BadRequestException(
-				'Токен истек. Пожалуйста, запросите новый токен для подтверждения сброса пароля.'
-			)
-		}
+		// if (hasExpired) {
+		// 	throw new BadRequestException(
+		// 		'Токен истек. Пожалуйста, запросите новый токен для подтверждения сброса пароля.'
+		// 	)
+		// }
 
-		const existingUser = await this.userService.findByEmail(
-			existingToken.email
-		)
+		// const existingUser = await this.userService.findByEmail(
+		// 	existingToken.email
+		// )
 
-		if (!existingUser) {
-			throw new NotFoundException(
-				'Пользователь не найден. Пожалуйста, проверьте введенный адрес электронной почты и попробуйте снова.'
-			)
-		}
+		// if (!existingUser) {
+		// 	throw new NotFoundException(
+		// 		'Пользователь не найден. Пожалуйста, проверьте введенный адрес электронной почты и попробуйте снова.'
+		// 	)
+		// }
 
-		await this.prismaService.user.update({
-			where: {
-				id: existingUser.id
-			},
-			data: {
-				password: await hash(dto.password)
-			}
-		})
+		// await this.prismaService.user.update({
+		// 	where: {
+		// 		id: existingUser.id
+		// 	},
+		// 	data: {
+		// 		password: await hash(dto.password)
+		// 	}
+		// })
 
-		await this.prismaService.token.delete({
-			where: {
-				id: existingToken.id,
-				type: TokenType.PASSWORD_RESET
-			}
-		})
+		// await this.prismaService.token.delete({
+		// 	where: {
+		// 		id: existingToken.id,
+		// 		type: TokenType.PASSWORD_RESET
+		// 	}
+		// })
 
 		return true
 	}
@@ -123,34 +122,34 @@ export class PasswordRecoveryService {
 	 * @returns Объект токена сброса пароля.
 	 */
 	private async generatePasswordResetToken(email: string) {
-		const token = uuidv4()
-		const expiresIn = new Date(new Date().getTime() + 3600 * 1000)
+		// const token = uuidv4()
+		// const expiresIn = new Date(new Date().getTime() + 3600 * 1000)
 
-		const existingToken = await this.prismaService.token.findFirst({
-			where: {
-				email,
-				type: TokenType.PASSWORD_RESET
-			}
-		})
+		// const existingToken = await this.prismaService.token.findFirst({
+		// 	where: {
+		// 		email,
+		// 		type: TokenType.PASSWORD_RESET
+		// 	}
+		// })
 
-		if (existingToken) {
-			await this.prismaService.token.delete({
-				where: {
-					id: existingToken.id,
-					type: TokenType.PASSWORD_RESET
-				}
-			})
-		}
+		// if (existingToken) {
+		// 	await this.prismaService.token.delete({
+		// 		where: {
+		// 			id: existingToken.id,
+		// 			type: TokenType.PASSWORD_RESET
+		// 		}
+		// 	})
+		// }
 
-		const passwordResetToken = await this.prismaService.token.create({
-			data: {
-				email,
-				token,
-				expiresIn,
-				type: TokenType.PASSWORD_RESET
-			}
-		})
+		// const passwordResetToken = await this.prismaService.token.create({
+		// 	data: {
+		// 		email,
+		// 		token,
+		// 		expiresIn,
+		// 		type: TokenType.PASSWORD_RESET
+		// 	}
+		// })
 
-		return passwordResetToken
+		return `passwordResetToken`
 	}
 }
